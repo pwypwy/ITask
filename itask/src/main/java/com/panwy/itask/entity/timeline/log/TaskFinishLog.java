@@ -11,6 +11,7 @@ import com.panwy.itask.entity.BaseEntity;
 
 import lombok.Data;
 
+//
 @Entity
 @Data
 public class TaskFinishLog extends BaseEntity implements Serializable {
