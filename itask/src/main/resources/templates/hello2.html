@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">  
+		<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script th:src="@{/js/dataPlus.js}" charset="utf-8"></script>
+		<script th:src="@{/js/modelDefine.js}" charset="utf-8"></script>
+	</head>
+	<body>
+
+	</body>
+	<script th:inline="javascript">
+		const modelType = /*[[${model}]]*/ 'default';
+		const mt = 'Page'+modelType
+		//alert(modelType);
+		pui.visualize(modelType)
+		//console.log(age)
+
+	</script>
+</html>
