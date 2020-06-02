@@ -29,7 +29,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         
         auth.inMemoryAuthentication()
                 .passwordEncoder(passwordEncoder()) // 指定加密方式
-                .withUser("xxx").password(passwordEncoder().encode("xxxxx")).roles("ADMIN");
+                .withUser("pwy").password(passwordEncoder().encode("panda")).roles("ADMIN");
     }
 
     @Bean
