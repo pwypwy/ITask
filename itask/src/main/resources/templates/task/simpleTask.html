@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="_csrf" th:content="${_csrf.token}" />
+		<!-- default header name is X-CSRF-TOKEN -->
+		<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">  
+		<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script src="https://cdn.staticfile.org/axios/0.18.0/axios.min.js"></script>
+		<script th:src="@{/js/dataPlus.js}" charset="utf-8"></script>
+		<!-- <script th:src="@{/js/modelDefine.js}" charset="utf-8"></script> -->
+		<style type="text/css">
+			td
+			{
+				white-space: nowrap;
+				overflow:hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+	</body>
+	<script th:inline="javascript">
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+		axios.defaults.headers.common['X-CSRF-TOKEN'] = token
+		// const modelType = /*[[${model}]]*/ 'default';
+		// const mt = 'Page'+modelType
+		init()
+		pui.visualize('PageSimpleTask')
+		function init() {
+			//任务定义
+			pue.define('SimpleTask',
+			{
+				fields:{
+					id:{
+						type:'number',
+						name:'ID'
+					},	
+					taskName:{
+						type:'string',
+						name:'任务名称'
+					},
+					remark:{
+						type:'string',
+						name:'备注'
+					},
+					tag:{
+						type:'string',
+						name:'标签'
+					},
+					summary:{
+						type:'string',
+						name:'总结'
+					},
+					taskState:{
+						type:'string',
+						name:'任务状态',
+						enum:['未启动','进行中','已暂停','已完成','已终止']
+					},
+					taskType:{
+						type:'string',
+						name:'任务类型'
+					},
+					expectConsumeTime:{
+						type:'number',
+						name:'预估消耗时间'
+					},
+					historyTime:{
+						type:'number',
+						name:'历时消耗时间'
+					},
+					priority:{
+						type:'number',
+						name:'优先级'
+					},
+					lastOpTime:{
+						type:'datetime',
+						name:'最后操作时间'
+					},
+					creTime:{
+						type:'datetime',
+						name:'创建时间'
+					},
+					crePerson:{
+						type:'string',
+						name:'创建人'
+					}					
+
+				},
+				methods:{
+					load(){
+						var data = {
+							name:'pwy',
+							pass:'666666'
+						}
+						return data  			
+					},
+					edit:{
+						'-t':'gen',
+						//paramType:'user',
+						name:'修改',
+						*fun(data){
+							let param = dataModel.new('SimpleTask',data)
+							console.log(':param:')
+							console.log(param)
+	            			param = yield param
+							// console.log(':param:')
+							// console.log(:param)
+							let result 
+							axios.post('/task/simple/save',param)
+							.then(response => (result = response))
+							.catch(function (error) { // 请求失败处理
+								alert('请求失败处理')
+								console.log(error)
+							})
+
+							return result
+						}
+					},
+					delete:{	
+						'-t':'fun',		
+						name:'删除',
+						fun(data){
+							let result 
+							axios.post('/task/simple/del',data)
+							.then(response => (result = response))
+							.catch(function (error) { // 请求失败处理
+								alert('请求失败处理')
+								console.log(error);
+							});
+
+							return result
+						}
+					},
+					copy:{
+						'-t':'gen',
+						//paramType:'user',
+						name:'复制',
+						*fun(data){
+							let param = dataModel.new('SimpleTask',data)
+							param = yield param
+							param.id = null
+							// console.log(':param:')
+							// console.log(:param)
+							let result 
+							axios.post('/task/simple/save',param)
+							.then(response => (result = response))
+							.catch(function (error) { // 请求失败处理
+								alert('请求失败处理')
+								console.log(error);
+							});
+
+							return result
+						}
+					}
+				},
+				init(param){
+					let result = {
+						id:param.id,
+						taskName:param.taskName,
+						remark:param.remark,
+						tag:param.tag,
+						summary:param.summary,
+						taskState:param.taskState,
+						taskType:param.taskType,
+						expectConsumeTime:param.expectConsumeTime,
+						historyTime:param.historyTime,
+						priority:param.priority,
+						lastOpTime:param.lastOpTime,
+						creTime:param.creTime,
+						crePerson:param.crePerson
+					}
+					return result
+				}
+			})
+
+			//用户页面
+			pue.define('PageSimpleTask',
+			{
+				fields:{
+					list:{
+						type:'list<SimpleTask>',
+						name:''
+					}
+
+				},
+				methods:{
+					async load(){
+						//let list 
+						let res = await axios.get('/task/simple/all')
+
+						var data = {
+							list:res.data
+						}
+						//alert('加载')
+						//console.log(data)
+
+						return data  			
+					},
+					query:{
+						'-t':'fun',	
+						//paramType:'User',
+						name:'查询',
+						fun(data){
+							let list
+							axios.get('/task/simple/all')
+							.then(response => (data.list = response.data))
+							.catch(function (error) { // 请求失败处理
+								alert('请求失败处理')
+								console.log(error)
+							})
+							// = list
+						}
+					},
+					create:{
+						'-t':'fun',	
+						paramType:'SimpleTask',
+						name:'创建',
+						fun(data,param){
+							let result
+							axios.post('/task/simple/save',param)
+							.then(response => (result = response))
+							.catch(function (error) { // 请求失败处理
+								alert('请求失败处理')
+								console.log(error)
+							})
+							return result
+						}
+					}
+
+				}
+			})
+		}
+
+	</script>
+</html>

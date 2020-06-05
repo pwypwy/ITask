@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="_csrf" th:content="${_csrf.token}" />
+		<!-- default header name is X-CSRF-TOKEN -->
+		<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">  
+		<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script src="https://cdn.staticfile.org/axios/0.18.0/axios.min.js"></script>
+		<script th:src="@{/js/dataPlus.js}" charset="utf-8"></script>
+		<!-- <script th:src="@{/js/modelDefine.js}" charset="utf-8"></script> -->
+		<style type="text/css">
+			td
+			{
+				white-space: nowrap;
+				overflow:hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+	</body>
+	<script th:inline="javascript">
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+		axios.defaults.headers.common['X-CSRF-TOKEN'] = token
+		// const modelType = /*[[${model}]]*/ 'default';
+		// const mt = 'Page'+modelType
+		init()
+		pui.visualize('MyTask')
+		function init() {
+
+			//共用字段:
+			var fields = {
+					id:{
+						type:'number',
+						name:'ID'
+					},	
+					taskName:{
+						type:'string',
+						name:'任务名称'
+					},
+					remark:{
+						type:'string',
+						name:'备注'
+					},
+					tag:{
+						type:'string',
+						name:'标签'
+					},
+					summary:{
+						type:'string',
+						name:'总结'
+					},
+					taskState:{
+						type:'string',
+						name:'任务状态',
+						enum:['未启动','进行中','已暂停','已完成','已终止']
+					},
+					taskType:{
+						type:'string',
+						name:'任务类型'
+					},
+					expectConsumeTime:{
+						type:'number',
+						name:'预估消耗时间'
+					},
+					historyTime:{
+						type:'number',
+						name:'历时消耗时间'
+					},
+					priority:{
+						type:'number',
+						name:'优先级'
+					},
+					lastOpTime:{
+						type:'datetime',
+						name:'最后操作时间'
+					},
+					creTime:{
+						type:'datetime',
+						name:'创建时间'
+					}				
+
+				}
+
+			//未开始任务定义
+			pue.define('initTask',
+			{
+				fields,
+				methods:{
+					load(){
+						var data = {}
+						return data  			
+					},
+					start:{
+						'-t':'fun',
+						//paramType:'user',
+						name:'启动',
+						fun(data){							
+							let result 
+							axios.post('/task/my/start',data)
+							.then(response => (location.reload()))
+							.catch(function (error) { // 请求失败处理
+								alert('请求失败处理')
+								console.log(error)
+							})
+
+							return result
+						}
+					},
+					finish:{
+						'-t':'fun',
+						//paramType:'user',
+						name:'完成',
+						fun(data){							
+							let result 
+							axios.post('/task/my/finsih',data)
+							.then(response => (location.reload()))
+							.catch(function (error) { // 请求失败处理
+								alert('请求失败处理')
+								console.log(error)
+							})
+
+							return result
+						}
+					},
+					stop:{
+						'-t':'fun',
+						//paramType:'user',
+						name:'中止',
+						fun(data){							
+							let result 
+							axios.post('/task/my/stop',data)
+							.then(response => (location.reload()))
+							.catch(function (error) { // 请求失败处理
+								alert('请求失败处理')
+								console.log(error)
+							})
+
+							return result
+						}
+					},
+					edit:{
+						'-t':'gen',
+						//paramType:'editTask',
+						name:'编辑',
+						*fun(data){		
+							
+							let param = dataModel.new('editTask',data)
+							console.log(':param:')
+							console.log(param)
+							param = yield param
+
+							for (const k in param) {
+								data[k] = param[k]
+							}
+							
+							let result 
+							axios.post('/task/my/edit',data)
+							.then(response => (location.reload()))
+							.catch(function (error) { // 请求失败处理
+								alert('请求失败处理')
+								console.log(error)
+							})
+
+							return result
+						}
+					}
+				},
+				init(param){
+					let result = {
+						id:param.id,
+						taskName:param.taskName,
+						remark:param.remark,
+						tag:param.tag,
+						summary:param.summary,
+						taskState:param.taskState,
+						taskType:param.taskType,
+						expectConsumeTime:param.expectConsumeTime,
+						historyTime:param.historyTime,
+						priority:param.priority,
+						lastOpTime:param.lastOpTime,
+						creTime:param.creTime
+					}
+					return result
+				}
+			})
+
+
+			//进行中任务定义
+			pue.define('executingTask',
+			{
+				fields,
+				methods:{
+					load(){
+						var data = {}
+						return data  			
+					},
+					suspend:{
+						'-t':'fun',
+						//paramType:'user',
+						name:'暂停',
+						fun(data){							
+							let result 
+							axios.post('/task/my/suspend',data)
+							.then(response => (location.reload()))
+							.catch(function (error) { // 请求失败处理
+								alert('请求失败处理')
+								console.log(error)
+							})
+
+							return result
+						}
+					},
+					finish:{
+						'-t':'fun',
+						//paramType:'user',
+						name:'完成',
+						fun(data){							
+							let result 
+							axios.post('/task/my/finsih',data)
+							.then(response => (location.reload()))
+							.catch(function (error) { // 请求失败处理
+								alert('请求失败处理')
+								console.log(error)
+							})
+
+							return result
+						}
+					},
+					stop:{
+						'-t':'fun',
+						//paramType:'user',
+						name:'中止',
+						fun(data){							
+							let result 
+							axios.post('/task/my/stop',data)
+							.then(response => (location.reload()))
+							.catch(function (error) { // 请求失败处理
+								alert('请求失败处理')
+								console.log(error)
+							})
+
+							return result
+						}
+					},
+					edit:{
+						'-t':'gen',
+						//paramType:'editTask',
+						name:'编辑',
+						*fun(data){		
+							
+							let param = dataModel.new('editTask',data)
+							console.log(':param:')
+							console.log(param)
+							param = yield param
+
+							for (const k in param) {
+								data[k] = param[k]
+							}
+							
+							let result 
+							axios.post('/task/my/edit',data)
+							.then(response => (location.reload()))
+							.catch(function (error) { // 请求失败处理
+								alert('请求失败处理')
+								console.log(error)
+							})
+
+							return result
+						}
+					}
+				},
+				init(param){
+					let result = {
+						id:param.id,
+						taskName:param.taskName,
+						remark:param.remark,
+						tag:param.tag,
+						summary:param.summary,
+						taskState:param.taskState,
+						taskType:param.taskType,
+						expectConsumeTime:param.expectConsumeTime,
+						historyTime:param.historyTime,
+						priority:param.priority,
+						lastOpTime:param.lastOpTime,
+						creTime:param.creTime
+					}
+					return result
+				}
+			})
+
+
+			//已暂停任务定义
+			pue.define('suspendTask',
+			{
+				fields,
+				methods:{
+					load(){
+						var data = {}
+						return data  			
+					},
+					restart:{
+						'-t':'fun',
+						//paramType:'user',
+						name:'恢复',
+						fun(data){							
+							let result 
+							axios.post('/task/my/restart',data)
+							.then(response => (location.reload()))
+							.catch(function (error) { // 请求失败处理
+								alert('请求失败处理')
+								console.log(error)
+							})
+							
+							return result
+						}
+					},
+					finish:{
+						'-t':'fun',
+						//paramType:'user',
+						name:'完成',
+						fun(data){							
+							let result 
+							axios.post('/task/my/finsih',data)
+							.then(response => (location.reload()))
+							.catch(function (error) { // 请求失败处理
+								alert('请求失败处理')
+								console.log(error)
+							})
+
+							return result
+						}
+					},
+					stop:{
+						'-t':'fun',
+						//paramType:'user',
+						name:'中止',
+						fun(data){							
+							let result 
+							axios.post('/task/my/stop',data)
+							.then(response => (location.reload()))
+							.catch(function (error) { // 请求失败处理
+								alert('请求失败处理')
+								console.log(error)
+							})
+
+							return result
+						}
+					}
+				},
+				init(param){
+					let result = {
+						id:param.id,
+						taskName:param.taskName,
+						remark:param.remark,
+						tag:param.tag,
+						summary:param.summary,
+						taskState:param.taskState,
+						taskType:param.taskType,
+						expectConsumeTime:param.expectConsumeTime,
+						historyTime:param.historyTime,
+						priority:param.priority,
+						lastOpTime:param.lastOpTime,
+						creTime:param.creTime
+					}
+					return result
+				}
+			})
+
+
+			//已完成任务定义
+			pue.define('finishTask',
+			{
+				fields,
+				methods:{
+					load(){
+						var data = {}
+						return data  			
+					},
+				},
+				init(param){
+					let result = {
+						id:param.id,
+						taskName:param.taskName,
+						remark:param.remark,
+						tag:param.tag,
+						summary:param.summary,
+						taskState:param.taskState,
+						taskType:param.taskType,
+						expectConsumeTime:param.expectConsumeTime,
+						historyTime:param.historyTime,
+						priority:param.priority,
+						lastOpTime:param.lastOpTime,
+						creTime:param.creTime
+					}
+					return result
+				}
+			})
+
+
+			//已中止任务定义
+			pue.define('stopTask',
+			{
+				fields,
+				methods:{
+					load(){
+						var data = {}
+						return data  			
+					},
+				},
+				init(param){
+					let result = {
+						id:param.id,
+						taskName:param.taskName,
+						remark:param.remark,
+						tag:param.tag,
+						summary:param.summary,
+						taskState:param.taskState,
+						taskType:param.taskType,
+						expectConsumeTime:param.expectConsumeTime,
+						historyTime:param.historyTime,
+						priority:param.priority,
+						lastOpTime:param.lastOpTime,
+						creTime:param.creTime
+					}
+					return result
+				}
+			})
+
+			//任务操作页面
+			pue.define('MyTask',
+			{
+				fields:{
+					executingTasks:{
+						type:'list<executingTask>',
+						name:'执行中任务列表'
+					},
+					initTasks:{
+						type:'list<initTask>',
+						name:'未执行任务列表'
+					},
+					suspendTasks:{
+						type:'list<suspendTask>',
+						name:'已暂停任务列表'
+					},
+					finishTasks:{
+						type:'list<finishTask>',
+						name:'已完成任务列表'
+					},
+					stopTasks:{
+						type:'list<stopTask>',
+						name:'已终止任务列表'
+					}
+
+				},
+				methods:{
+					async load(){
+						//let list 
+						let res = await axios.get('/task/my/all')
+
+						var data = res.data
+						//alert('加载')
+						console.log(data)
+
+						return data  			
+					},
+					create:{
+						'-t':'fun',
+						paramType:'createTask',
+						name:'创建任务',
+						fun(data,param){							
+							let result 
+							axios.post('/task/my/create',param)
+							.then(response => (location.reload()))
+							.catch(function (error) { // 请求失败处理
+								alert('请求失败处理')
+								console.log(error)
+							})
+							
+							return result
+						}
+					}
+				}
+			})
+		
+			//创建任务
+			pue.define('createTask',
+			{
+				fields:{					
+					taskName:{
+						type:'string',
+						name:'任务名称'
+					},
+					remark:{
+						type:'string',
+						name:'备注'
+					},
+					tag:{
+						type:'string',
+						name:'标签'
+					},
+					taskType:{
+						type:'string',
+						name:'任务类型'
+					},
+					expectConsumeTime:{
+						type:'number',
+						name:'预估消耗时间'
+					},
+					priority:{
+						type:'number',
+						name:'优先级'
+					}				
+
+				},
+				methods:{
+					load(){
+						var data = {}
+						return data  			
+					}				
+				},
+				init(param){
+					let result = {						
+						taskName:param.taskName,
+						remark:param.remark,
+						tag:param.tag,					
+						taskType:param.taskType,
+						expectConsumeTime:param.expectConsumeTime,						
+						priority:param.priority					
+					}
+					return result
+				}
+			})
+
+			//编辑任务
+			pue.define('editTask',
+			{
+				fields:{										
+					remark:{
+						type:'string',
+						name:'备注'
+					},
+					tag:{
+						type:'string',
+						name:'标签'
+					},
+					taskType:{
+						type:'string',
+						name:'任务类型'
+					},
+					expectConsumeTime:{
+						type:'number',
+						name:'预估消耗时间'
+					},
+					priority:{
+						type:'number',
+						name:'优先级'
+					}				
+
+				},
+				methods:{
+					load(){
+						var data = {}
+						return data  			
+					}				
+				},
+				init(param){
+					let result = {												
+						remark:param.remark,
+						tag:param.tag,					
+						taskType:param.taskType,
+						expectConsumeTime:param.expectConsumeTime,						
+						priority:param.priority					
+					}
+					return result
+				}
+			})
+
+		}
+
+	</script>
+</html>
